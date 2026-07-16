@@ -7,7 +7,7 @@
     <Nullable>disable</Nullable>
     <Authors>maschine</Authors>
     <Company>https://github.com/maschine34675/DualSideDoorBreach</Company>
-    <AssemblyVersion>1.0.0</AssemblyVersion>
+    <AssemblyVersion>1.1.0</AssemblyVersion>
     <FileVersion>$(AssemblyVersion)</FileVersion>
     <Configurations>Debug;Release</Configurations>
     <Version>$(AssemblyVersion)</Version>
@@ -67,6 +67,25 @@
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="copy &quot;$(TargetPath)&quot; &quot;$(ProjectDir)\..\..\BepInEx\plugins\$(TargetFileName)&quot;" />
+  </Target>
+
+  <!--
+    Release builds also produce the distributable zip next to the project:
+    maschine-DualSideDoorBreach-<version>.zip with the BepInEx/plugins/... layout
+    (extracts over the game root; the DLL lives directly in plugins, no subfolder).
+  -->
+  <Target Name="CreateReleaseZip" AfterTargets="Build" Condition="'$(Configuration)' == 'Release'">
+    <PropertyGroup>
+      <PackageRoot>$(ProjectDir)obj\package\</PackageRoot>
+      <PackagePluginDir>$(PackageRoot)BepInEx\plugins\</PackagePluginDir>
+      <ReleaseZipPath>$(ProjectDir)maschine-DualSideDoorBreach-$(AssemblyVersion).zip</ReleaseZipPath>
+    </PropertyGroup>
+    <RemoveDir Directories="$(PackageRoot)" />
+    <MakeDir Directories="$(PackagePluginDir)" />
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(PackagePluginDir)" />
+    <Delete Files="$(ReleaseZipPath)" />
+    <ZipDirectory SourceDirectory="$(PackageRoot)" DestinationFile="$(ReleaseZipPath)" />
+    <Message Importance="high" Text="Release package created: $(ReleaseZipPath)" />
   </Target>
 
 </Project>

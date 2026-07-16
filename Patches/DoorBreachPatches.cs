@@ -25,7 +25,6 @@ namespace DualSideDoorBreach.Patches
             return false;
         }
     }
-
     internal sealed class DoorBreachSuccessRollPatch : ModulePatch
     {
         protected override MethodBase GetTargetMethod()
@@ -54,13 +53,10 @@ namespace DualSideDoorBreach.Patches
                 __result = DoorBreachUtil.VanillaBreachSuccessRoll(__instance, yourPosition);
                 return false;
             }
-
-            var breachPlayer = DoorBreachUtil.ResolveLocalPlayer(__instance.InteractingPlayer);
-            __result = DoorKeyUtil.PlayerCanBreachLockedDoor(__instance, breachPlayer);
+            __result = true;
             return false;
         }
     }
-
     internal sealed class DoorKickOpenVectorPatch : ModulePatch
     {
         protected override MethodBase GetTargetMethod()
@@ -81,12 +77,8 @@ namespace DualSideDoorBreach.Patches
 
             if (Plugin.AdjustOpenDirection.Value)
                 BreachKickContext.Begin(__instance, yourPosition);
-
-            if (DoorKeyUtil.IsLockedBreachTarget(__instance))
-            {
-                var player = DoorBreachUtil.ResolveLocalPlayer(__instance.InteractingPlayer);
-                DoorKeyUtil.TryConsumeKeyForBreach(__instance, player);
-            }
+            if (PendingKeyConsume.TryTake(__instance, out var breacher))
+                DoorKeyUtil.TryConsumeKeyForBreach(__instance, breacher);
         }
 
         [PatchPostfix]
@@ -102,7 +94,6 @@ namespace DualSideDoorBreach.Patches
             return __exception;
         }
     }
-
     internal sealed class DoorKickOpenBoolPatch : ModulePatch
     {
         protected override MethodBase GetTargetMethod()
@@ -126,7 +117,6 @@ namespace DualSideDoorBreach.Patches
             return false;
         }
     }
-
     internal sealed class DoorInitSmoothOpenPatch : ModulePatch
     {
         private static readonly MethodInfo InitSmoothOpenMethod =

@@ -53,10 +53,17 @@ namespace DualSideDoorBreach.Patches
 
             if (__result.DoorState != EDoorState.Locked)
                 return;
-
+            if (string.IsNullOrEmpty(__result.KeyId))
+                return;
             var player = (Player)_playerField.GetValue(__instance);
-            if (!DoorKeyUtil.PlayerCanBreachLockedDoor(__result, player))
+            if (!DoorKeyUtil.HasMatchingKeyAndSkill(__result, player))
+            {
                 __result = null;
+                return;
+            }
+
+            if (!Plugin.AllowBreachWithoutKey.Value)
+                PendingKeyConsume.Set(__result, player);
         }
     }
 }

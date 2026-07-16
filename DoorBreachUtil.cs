@@ -8,11 +8,15 @@ namespace DualSideDoorBreach
     {
         public static bool IsBreachOnlyInteractionDoor(Door door)
         {
+            return door != null && IsBreachOnlyInteractionDoor(door, door.DoorState);
+        }
+        public static bool IsBreachOnlyInteractionDoor(Door door, EDoorState effectiveState)
+        {
             if (door == null)
                 return false;
 
             if (door.CanInteractWithBreach
-                && door.DoorState == EDoorState.Locked
+                && effectiveState == EDoorState.Locked
                 && string.IsNullOrEmpty(door.KeyId))
             {
                 return true;
@@ -23,7 +27,6 @@ namespace DualSideDoorBreach
 
             return door.CanInteractWithBreach || door.CanBeBreached;
         }
-
         public static bool AllowsInteractionRaycast(WorldInteractiveObject worldObject)
         {
             if (worldObject == null)
@@ -65,7 +68,6 @@ namespace DualSideDoorBreach
 
             return DoorKeyUtil.PlayerCanBreachLockedDoor(owner, door);
         }
-
         public static bool EvaluateIsBreachAngle(Door door, Vector3 yourPosition)
         {
             if (!IsBreachAllowed(door))
@@ -97,7 +99,6 @@ namespace DualSideDoorBreach
 
             return !VanillaBreachWouldSucceed(door, yourPosition);
         }
-
         public static bool VanillaBreachSuccessRoll(Door door, Vector3 yourPosition)
         {
             var toPlayer = door.transform.TransformPoint(door.viewTarget1) - yourPosition;

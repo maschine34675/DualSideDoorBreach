@@ -58,6 +58,9 @@ namespace DualSideDoorBreach.Patches
                 return true;
 
             var player = (Player)PlayerField.GetValue(__instance);
+            if (player != null && !player.IsYourPlayer)
+                return true;
+
             if (!DoorKeyUtil.PlayerCanBreachLockedDoor(door, player))
                 return false;
 

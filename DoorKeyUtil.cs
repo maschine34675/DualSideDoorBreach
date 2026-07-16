@@ -29,13 +29,18 @@ namespace DualSideDoorBreach
         {
             if (!Plugin.RequireKeyForLockedBreach.Value)
                 return true;
+            if (Plugin.AllowBreachWithoutKey.Value)
+                return true;
 
             if (door.DoorState != EDoorState.Locked)
                 return true;
-
             if (string.IsNullOrEmpty(door.KeyId))
                 return true;
 
+            return HasMatchingKeyAndSkill(door, player);
+        }
+        public static bool HasMatchingKeyAndSkill(Door door, Player player)
+        {
             if (player == null)
                 return false;
 
